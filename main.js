@@ -2,7 +2,7 @@ console.log("Play Fair Chipper Algorithm");
 
 
 
-function except(sentences,exception=""){
+function except(exception=""){
     /* 
     Mencegah huruf yang sama
     jika parameter exeption di isi maka
@@ -13,6 +13,8 @@ function except(sentences,exception=""){
     func("sweep","") -> "swep"
     func("sweep","we") -> "wesp"
     */
+    exception = exception.toUpperCase();
+    var sentences    = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
     var ada,i,j;
     for(i=0,len=sentences.length;i<len;i++){
         ada=false;
@@ -47,24 +49,27 @@ function toMatrix(text){
 }
 
 function normalizePlainText(text){
-    text=text.split(" ").join("");
+    text = text.toUpperCase();
+    text = text.split(" ").join("");
     var newText="",idx=0,i;
 
     for(i=0,len=text.length;i<len;i++){
-        if(idx+1==len){
-            newText+=text[idx]+"Z";
-            newText+=" ";
-            break;
-        }
-        else if(text[idx]!=text[idx+1]){
-            newText+=text[idx]+text[idx+1];
-            newText+=" ";
-            idx+=2;
-        }
-        else{
-            newText+=text[idx]+"Z";
-            newText+=" ";
-            idx++;
+        if(idx<=len-1){
+            if(idx+1==len){
+                newText+=text[idx]+"Z";
+                newText+=" ";
+                break;
+            }
+            else if(text[idx]!=text[idx+1]){
+                newText+=text[idx]+text[idx+1];
+                newText+=" ";
+                idx+=2;
+            }
+            else{
+                newText+=text[idx]+"Z";
+                newText+=" ";
+                idx++;
+            }
         }
     }
 
@@ -93,16 +98,18 @@ function whereLocation(matrix,character){
     return false;
 }
 
-function encrypt(matrix,text){
+function transEncrypt(matrix,text){
     var i,kata=text.split(" "),
         stringOut="",
         karakter1Out="",
-        karakter2Out="";
+        karakter2Out="";  
 
     for(i=0,len=kata.length;i<len;i++){
         if(kata[i]!=""){
+
             karakter1=whereLocation(matrix,kata[i][0]);
             karakter2=whereLocation(matrix,kata[i][1]);
+            
             
             if(karakter1.baris==karakter2.baris){
                 /* Jika baris sama */
@@ -125,24 +132,87 @@ function encrypt(matrix,text){
     return stringOut;
 }
 
+function transDecrypt(matrix,text){
+    var i,kata=text.split(" "),
+        stringOut="",
+        karakter1Out="",
+        karakter2Out="";
+   
+    for(i=0,len=kata.length;i<len;i++){
+        if(kata[i]!=""){
+            karakter1=whereLocation(matrix,kata[i][0]);
+            karakter2=whereLocation(matrix,kata[i][1]);
+
+            if(karakter1.baris==karakter2.baris){
+                
+                /* Jika baris sama */
+                a = karakter1.kolom-1
+                if (a<0){
+                    a=4
+                }
+
+                b = karakter2.kolom-1
+                if (b<0){
+                    b=4
+                }
+
+                karakter1Out=matrix[karakter1.baris][a];
+                karakter2Out=matrix[karakter1.baris][b];
+            }
+            else if(karakter1.kolom==karakter2.kolom){
+                /* Jika kolomnya sama */
+                a = karakter1.baris-1
+                if (a<0){
+                    a=4
+                }
+
+                b = karakter2.baris-1
+                if (b<0){
+                    b=4
+                }
+
+                karakter1Out=matrix[a][karakter1.kolom];
+                karakter2Out=matrix[b][karakter1.kolom];
+            }
+            else{
+                /* Jika baris dan kolom berbeda */
+                karakter1Out=matrix[karakter1.baris][karakter2.kolom];
+                karakter2Out=matrix[karakter2.baris][karakter1.kolom];
+            }
+            stringOut+=karakter1Out+karakter2Out+" ";
+        }
+    }
+    return stringOut;
+}
+
+
+function encrypt(PlainText,Key){
+    Matrix      = toMatrix(except(Key));
+    // console.log(PlainText)
+    PlainText   = normalizePlainText(PlainText);
+    // console.log(PlainText)
+    return transEncrypt(Matrix,PlainText);
+}
+
+function decrypt(Chipper,Key){
+    
+    var Matrix  = toMatrix(except(Key));
+    // console.log(Matrix)
+    return transDecrypt(Matrix,Chipper);
+}
+
+
 var Key         = "MONARCHY";
-var PlainText   = "INSTRUMENTS";
-var alphabet    = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
+var PlainText   = "AL BIRR KARIM SUSANTO";
 /* j is equal with i */
 
+console.log("Kunci : \n",Key)
+console.log("PlainText : \n",PlainText)
 
-Key     = except(alphabet,Key);
-Matrix  = toMatrix(Key);
+var Chipper = encrypt(PlainText,Key);
 
-PlainText   = normalizePlainText(PlainText);
-var Chipper = encrypt(Matrix,PlainText);
+console.log("Chipper : \n",Chipper);
 
+var result = decrypt(Chipper,Key); 
 
-console.log("\n\nPlain Teks :");
-console.log(PlainText);
-
-console.log("\n\nKey Matrix :");
-console.log(Matrix);
-
-console.log("\n\nCipher :");
-console.log(Chipper);
+console.log("Plain text hasil decrypt : \n",result)
