@@ -1,5 +1,10 @@
 console.log("Play Fair Chipper Algorithm");
+/*
+Nama        : AL BIRR KARIM SUSANTO
+NIM         : A11.2017.10642
+Kelompok    : A11.4601
 
+*/
 
 
 function except(exception=""){
